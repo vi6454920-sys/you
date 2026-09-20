@@ -85,8 +85,11 @@ h1,h2,h3,h4{font-family:'Sora','Space Grotesk','Onest',Inter,sans-serif;letter-s
 .btn.ghost:hover{background:rgba(255,45,85,0.1);box-shadow:var(--glow)}
 .btn.sm{padding:9px 16px;font-size:13.5px;border-radius:11px}
 .hero .examples{margin-top:18px;font-size:13px;color:var(--muted-2)}
-.hero .examples code{color:#ffb3c1;background:rgba(255,45,85,0.07);padding:2px 8px;border-radius:6px;font-family:'Space Grotesk','Onest',Inter,sans-serif;cursor:pointer;margin:0 3px;display:inline-block}
-.hero .examples code:hover{background:rgba(255,45,85,0.16)}
+.hero .examples button{color:#ffb3c1;background:rgba(255,45,85,0.07);border:0;padding:2px 8px;border-radius:6px;font-family:'Space Grotesk','Onest',Inter,sans-serif;cursor:pointer;margin:0 3px;display:inline-block}
+.hero .examples button:hover{background:rgba(255,45,85,0.16)}
+.field-error{min-height:22px;margin-top:8px;text-align:left;color:#ff9eb0;font-size:13px;font-weight:600}
+.search-shell.has-error{border-color:rgba(255,90,120,.8)!important;box-shadow:0 0 0 3px rgba(255,59,99,.18),var(--shadow-card,0 20px 50px rgba(0,0,0,.5))!important}
+.mode-switch button:focus-visible,.hero .examples button:focus-visible,.search-shell .btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .hero-feats{display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center;margin-top:46px;animation:fadeUp .7s .3s both}
 .hero-feats span{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px}
 .hero-feats span:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--red-neon);box-shadow:0 0 8px var(--red-neon)}
@@ -1644,23 +1647,24 @@ body::after{content:"";position:fixed;inset:-30%;z-index:0;pointer-events:none;o
   <!-- HERO -->
   <section id="hero" class="wrap hero">
     <span class="eyebrow"><span class="pulse"></span>Умный парсер · детектор выбросов · AI-аудитор</span>
-    <div class="mode-switch" id="modeSwitch">
-      <button class="on" data-m="audit" onclick="setMode('audit')">📊 Аудит канала</button>
-      <button data-m="idea" onclick="setMode('idea')">🔍 Поиск идей для роликов</button>
+    <div class="mode-switch" id="modeSwitch" role="group" aria-label="Режим работы">
+      <button class="on" data-m="audit" aria-pressed="true" onclick="setMode('audit')">📊 Аудит канала</button>
+      <button data-m="idea" aria-pressed="false" onclick="setMode('idea')">🔍 Поиск идей для роликов</button>
     </div>
 
     <div id="auditPane">
       <h1>У вас есть канал? <span class="hl">Узнайте, почему он не растёт.</span></h1>
       <p class="sub">Вставьте ссылку на свой YouTube-канал — мы разберём <b>что залетело, а что нет</b>, сравним с конкурентами и дадим <b>пошаговый план роста</b> простым языком.</p>
       <div class="searchbox">
-        <label class="search-label">🔗 Вставьте ссылку на свой канал</label>
+        <label class="search-label" for="urlInput">🔗 Вставьте ссылку на свой канал</label>
         <div class="search-shell">
-          <input id="urlInput" type="text" placeholder="youtube.com/@handle, /channel/UC..., /c/name или ссылка на видео" autocomplete="off" />
+          <input id="urlInput" type="text" inputmode="url" placeholder="youtube.com/@handle, /channel/UC..., /c/name или ссылка на видео" autocomplete="off" spellcheck="false" aria-describedby="urlError" />
           <button class="btn" id="analyzeBtn" onclick="startAnalysis()">Анализировать →</button>
         </div>
+        <div class="field-error" id="urlError" role="alert" aria-live="polite"></div>
         <div class="examples">Поддерживаются все форматы. Примеры: 
-          <code onclick="fillEx('https://www.youtube.com/@MrBeast')">@MrBeast</code>
-          <code onclick="fillEx('https://www.youtube.com/@veritasium')">@veritasium</code>
+          <button type="button" onclick="fillEx('https://www.youtube.com/@MrBeast')">@MrBeast</button>
+          <button type="button" onclick="fillEx('https://www.youtube.com/@veritasium')">@veritasium</button>
         </div>
 
       </div>
@@ -1670,11 +1674,12 @@ body::after{content:"";position:fixed;inset:-30%;z-index:0;pointer-events:none;o
       <h1>Найди тему, <span class="hl">которая гарантированно залетит.</span></h1>
       <p class="sub">Введи нишу или тему — найдём ролики, которые набрали <b>в разы больше</b> своего канала. Это <b>доказанные виральные форматы</b>, готовые к адаптации под тебя.</p>
       <div class="searchbox">
-        <label class="search-label">🔍 Тема, ниша или ключевое слово</label>
+        <label class="search-label" for="ideaInput">🔍 Тема, ниша или ключевое слово</label>
         <div class="search-shell">
-          <input id="ideaInput" type="text" placeholder="например: монтаж видео, инвестиции для новичков, рецепты пасты" autocomplete="off" />
+          <input id="ideaInput" type="search" placeholder="например: монтаж видео, инвестиции для новичков, рецепты пасты" autocomplete="off" aria-describedby="ideaError" />
           <button class="btn" id="ideaBtn" onclick="startIdeaSearch()">Найти выбросы →</button>
         </div>
+        <div class="field-error" id="ideaError" role="alert" aria-live="polite"></div>
         <div class="idea-filters">
           <div class="dd" data-dd="ideaPreset" title="Тип охоты за идеями">
             <button type="button" class="dd-btn" onclick="ddToggle(this)"><span class="dd-ic">🎯</span><span class="dd-val">Любые выбросы</span><span class="dd-arr">▾</span></button>
@@ -2052,15 +2057,22 @@ function vJsonParse(s){return vScrub(_vJsonParse0(s));}
 function _vJsonParse0(s){if(s&&typeof s==='object')return s;if(typeof s!=='string')return JSON.parse(s);var raw=String(s).trim();try{return JSON.parse(raw);}catch(e){}var t=raw.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();var oi=t.indexOf('{'),ai=t.indexOf('[');var useObj=(ai<0)||(oi>=0&&oi<ai);var a=useObj?oi:ai,bC=useObj?t.lastIndexOf('}'):t.lastIndexOf(']');if(a>=0&&bC>a){var s1=t.slice(a,bC+1).replace(/,\s*([}\]])/g,'$1');try{return JSON.parse(s1);}catch(e){}}if(a>=0){var s2=t.slice(a).replace(/,\s*([}\]])/g,'$1');try{return JSON.parse(vBalanceJson(s2));}catch(e){}}return JSON.parse(t);}
 const PLACEHOLDER="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2'%3E%3C/svg%3E";
 const safeImg=u=>u&&typeof u==='string'?u:PLACEHOLDER;
-function fillEx(u){$('#urlInput').value=u;startAnalysis();}
+function setFieldError(inputId,message){
+  const input=$('#'+inputId),error=$('#'+inputId.replace('Input','Error'));
+  if(!input||!error)return;
+  error.textContent=message||'';
+  input.setAttribute('aria-invalid',message?'true':'false');
+  input.closest('.search-shell')?.classList.toggle('has-error',!!message);
+}
+function fillEx(u){$('#urlInput').value=u;setFieldError('urlInput','');startAnalysis();}
 function goHome(){$('#dashboard').style.display='none';$('#loading').style.display='none';$('#ideas')&&($('#ideas').style.display='none');$('#hero').style.display='flex';const f=$('#chatFab');if(f)f.style.display='none';const p=$('#chatPanel');if(p)p.classList.remove('open');closeVideoDrawer();window.scrollTo(0,0);}
 
 /* ===================================================================== */
 /*  ENTRY GATE (YouTube / Telegram) + STANDALONE TELEGRAM CHAT           */
 /* ===================================================================== */
 function _hideMainSections(){['#hero','#dashboard','#loading','#ideas'].forEach(function(s){var el=$(s);if(el)el.style.display='none';});var f=$('#chatFab');if(f)f.style.display='none';var p=$('#chatPanel');if(p)p.classList.remove('open');}
-function showGate(){var g=$('#entryGate');if(g)g.classList.remove('hide');var tg=$('#tgScreen');if(tg)tg.classList.remove('show');var t=$('#toTgBtn');if(t)t.classList.remove('show');_hideMainSections();try{closeVideoDrawer();}catch(e){}window.scrollTo(0,0);}
-function hideGate(){var g=$('#entryGate');if(g)g.classList.add('hide');}
+function showGate(){var g=$('#entryGate');if(g){g.classList.remove('hide');g.removeAttribute('aria-hidden');g.inert=false;}var tg=$('#tgScreen');if(tg)tg.classList.remove('show');var t=$('#toTgBtn');if(t)t.classList.remove('show');_hideMainSections();try{closeVideoDrawer();}catch(e){}window.scrollTo(0,0);}
+function hideGate(){var g=$('#entryGate');if(g){g.classList.add('hide');g.setAttribute('aria-hidden','true');g.inert=true;}}
 function enterYoutube(){hideGate();var tg=$('#tgScreen');if(tg)tg.classList.remove('show');goHome();var t=$('#toTgBtn');if(t)t.classList.add('show');setTimeout(function(){var i=$('#urlInput');if(i)i.focus({preventScroll:true});},90);}
 function switchToYoutube(){enterYoutube();}
 function enterTelegram(){hideGate();_hideMainSections();var tg=$('#tgScreen');if(tg)tg.classList.add('show');var t=$('#toTgBtn');if(t)t.classList.remove('show');tgMountChat();setTimeout(function(){var i=$('#tgInput');if(i)i.focus({preventScroll:true});},160);}
@@ -2117,7 +2129,7 @@ function tgWire(){var i=$('#tgInput');if(i){i.addEventListener('keydown',functio
 let MODE='audit';
 function setMode(m){
   MODE=m;
-  document.querySelectorAll('#modeSwitch button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  document.querySelectorAll('#modeSwitch button').forEach(b=>{const active=b.dataset.m===m;b.classList.toggle('on',active);b.setAttribute('aria-pressed',active);});
   $('#hero')?.classList.toggle('tall',m==='idea');
   $('#auditPane').style.display=m==='audit'?'block':'none';
   $('#ideaPane').style.display=m==='idea'?'block':'none';
@@ -2135,7 +2147,8 @@ const IDEA_STEPS=[
 
 async function startIdeaSearch(){
   const q=$('#ideaInput').value.trim();
-  if(!q){$('#ideaInput').focus();return;}
+  if(!q){setFieldError('ideaInput','Введите тему или ключевое слово.');$('#ideaInput').focus();return;}
+  setFieldError('ideaInput','');
   const timeF=ddGet('ideaTime'), typeF=ddGet('ideaType'), sizeF=ddGet('ideaSize'), langF=ddGet('ideaLang'), presetF=ddGet('ideaPreset')||'';
   $('#hero').style.display='none';$('#dashboard').style.display='none';$('#ideas').style.display='none';
   $('#loading').style.display='flex';
@@ -3545,15 +3558,15 @@ function setStep(id,state){
 
 async function startAnalysis(){
   const raw=$('#urlInput').value.trim();
-  if(!raw){$('#urlInput').focus();return;}
+  if(!raw){setFieldError('urlInput','Вставьте ссылку на YouTube-канал или видео.');$('#urlInput').focus();return;}
+  const parsed=parseInput(raw);
+  setFieldError('urlInput','');
   $('#hero').style.display='none';$('#dashboard').style.display='none';
   $('#loading').style.display='flex';renderSteps();
   $('#loadTitle').textContent='Анализирую канал…';
   window.scrollTo(0,0);
   try{
     setStep('resolve','active');
-    const parsed=parseInput(raw);
-    if(!parsed)throw new Error('Не похоже на ссылку YouTube. Проверьте адрес.');
     const chId=await resolveChannelId(parsed);
     setStep('resolve','done');
 
@@ -5651,6 +5664,8 @@ function renderTriggerLab(){
 /* enter key */
 $('#urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')startAnalysis();});
 $('#ideaInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')startIdeaSearch();});
+$('#urlInput').addEventListener('input',()=>setFieldError('urlInput',''));
+$('#ideaInput')?.addEventListener('input',()=>setFieldError('ideaInput',''));
 try{renderQuota();}catch(e){}
 </script>
 <script>
@@ -8748,7 +8763,8 @@ async function v3Expand(query){
 /* полный override поиска идей */
 window.startIdeaSearch=async function(){
   var qEl=q('#ideaInput'); var query=(qEl?qEl.value:'').trim();
-  if(!query){ if(qEl)qEl.focus(); return; }
+  if(!query){ setFieldError('ideaInput','Введите тему или ключевое слово.'); if(qEl)qEl.focus(); return; }
+  setFieldError('ideaInput','');
   var timeF=ddGet('ideaTime'), typeF=ddGet('ideaType'), sizeF=ddGet('ideaSize'), langF=ddGet('ideaLang'), presetF=ddGet('ideaPreset')||'';
   q('#hero').style.display='none'; q('#dashboard').style.display='none'; q('#ideas').style.display='none';
   q('#loading').style.display='flex';
